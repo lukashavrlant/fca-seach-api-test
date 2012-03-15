@@ -13,7 +13,7 @@ function downloadResults($url) {
     return curl_exec($session);
 }
 
-function getJSON($text) {
+function getJSON($text, $query) {
     $xml = simplexml_load_string($text);
     $documents = array();
 
@@ -31,8 +31,20 @@ function getJSON($text) {
     $data = array();
     $data['data'] = $documents;
     $data['options'] = array(
-        'lang' => 'en'
+        'lang' => 'en',
+        'query' => $query
         );
 
     return json_encode($data);
+}
+
+function sendPOST($url, $data) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    $output = curl_exec($ch);
+    curl_close($ch);
+    return $output;
 }
