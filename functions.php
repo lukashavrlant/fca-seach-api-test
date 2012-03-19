@@ -38,6 +38,12 @@ function getJSON($text, $query) {
     return json_encode($data);
 }
 
+function normQuery($query) {
+    $query = strtolower(trim($query));
+    $query = str_replace(' ', '_', $query);
+    return $query;
+}
+
 function sendPOST($url, $data) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);

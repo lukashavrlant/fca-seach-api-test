@@ -10,10 +10,17 @@ $query = isset($_GET['query']) ? htmlspecialchars($_GET['query'], ENT_QUOTES) : 
 </form>
 <?php
 if ($query) {
+	$normQuery = normQuery($query);
 	$googleResults = getJSON(getResults($query, 50), $query);
-	file_put_contents('/Users/lukashavrlant/WebSites/chandler/cache/__temp/'.$query.'.txt', $googleResults);
-	// $googleResults = file_get_contents('/Users/lukashavrlant/WebSites/chandler/cache/__temp/fe82d11f002af646e3dc0938ccdf750e.txt');
-	$fcaResults = sendPOST('http://localhost/chandler/api.php', array('data' => $googleResults));
+
+	if(isset($_GET['save'])) {
+		file_put_contents(ROOT . 'saved/' . $normQuery . '.json', data);
+	}
+
+	// file_put_contents('/Users/lukashavrlant/WebSites/chandler/cache/__temp/'.$query.'.txt', $googleResults);
+	// $googleResults = file_get_contents('/Users/lukashavrlant/WebSites/chandler/cache/__temp/45a7b39d640d33e057941ea41bebefe8.txt');
+	// $fcaResults = sendPOST('http://localhost/chandler/api.php', array('data' => $googleResults));
+	$fcaResults = sendPOST('http://phoebe.inf.upol.cz/~havrlanl/fca/api.php', array('data' => $googleResults));
 	$json = json_decode($fcaResults);
 	if ($json) {
 		$sugg = $json->fca;
@@ -23,9 +30,14 @@ if ($query) {
 			$specialization[] = '+'.$spec->words[0];
 		}
 
-		echo implode(", ", $specialization);
+		$siblings = array();
+		foreach ($sugg->sib as $sib) {
+			$siblings[] = '∼'.implode(',', $sib->words);
+		}
 
-		var_dump($sugg);
+		echo implode(", ", $specialization);
+		echo "<br><br>";
+		echo implode(" | ", $siblings);
 	}
 	
 }
