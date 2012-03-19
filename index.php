@@ -11,10 +11,18 @@ $query = isset($_GET['query']) ? htmlspecialchars($_GET['query'], ENT_QUOTES) : 
 <?php
 if ($query) {
 	$normQuery = normQuery($query);
-	$googleResults = getJSON(getResults($query, 50), $query);
+	$path = ROOT . 'saved/' . $normQuery . '.json';
 
-	if(isset($_GET['save'])) {
-		file_put_contents(ROOT . 'saved/' . $normQuery . '.json', data);
+	if (file_exists($path)) {
+		$googleResults = file_get_contents($path);
+	} else {
+		$googleResults = getJSON(getResults($query, 50), $query);
+		if (strlen($googleResults) < 100) {
+			echo 'Cannot download data from Google.';
+		} elseif(isset($_GET['save'])) {
+			file_put_contents($path, $googleResults);
+		}
+
 	}
 
 	// file_put_contents('/Users/lukashavrlant/WebSites/chandler/cache/__temp/'.$query.'.txt', $googleResults);
